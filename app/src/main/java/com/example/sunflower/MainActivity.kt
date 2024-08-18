@@ -9,11 +9,10 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,9 +35,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
-
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import android.content.res.Configuration
+import android.content.res.Resources
 import com.example.sunflower.ui.theme.SunflowerTheme
 
 class MainActivity : ComponentActivity() {
@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
 data class Message(
     val author: String,
     val body: String,
-    val imageResourceId: Int?= null
+    val messageDataType: String?= null
 )
 
 @Composable
@@ -114,19 +114,20 @@ fun MessageCard(msg: Message) {
                 },
                 modifier = Modifier.animateContentSize().padding(1.dp)
             ) {
-                Column(modifier = Modifier.padding(all = 8.dp)) {
-                    if (msg.imageResourceId != null) {
-                        //add Image for message with padding
-                        Image(
-                            painter = painterResource(msg.imageResourceId),
-                            contentDescription = "Message Image",
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-                    }
+                if (msg.messageDataType == "imageGrid") {
+                    //add Image for message with padding
+                    /*
+                    Image(
+                        painter = painterResource(msg.imageResourceId),
+                        contentDescription = "Message Image",
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                     */
+                    ImageGrid()
+                } else if (msg.messageDataType == "text") {
                     Text(
                         text = msg.body,
                         modifier = Modifier.padding(all = 4.dp),
-                        //maxLines = if (isExpanded) Int.MAX_VALUE else 1,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -144,6 +145,29 @@ fun Conversation(messages: List<Message>) {
     }
 }
 
+@Composable
+fun ImageGrid(columns: Int = 2) {
+    val imageList = listOf(
+        R.drawable.character01,
+        R.drawable.character02,
+        R.drawable.character03,
+        R.drawable.character04
+    )
+    Row {
+        repeat(columns) { column ->
+            Column(Modifier.weight(1f)) {
+                imageList.chunked(columns)[column].forEach { imageId ->
+                    Image(
+                        painter = painterResource(id = imageId),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 fun PreviewConversation() {
@@ -151,21 +175,3 @@ fun PreviewConversation() {
         Conversation(SampleData.conversationSample)
     }
 }
-/*
-@Preview(name = "Light Mode")
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = true,
-    name = "Dark Mode"
-)
-@Composable
-fun PreviewMessageCard() {
-    SunflowerTheme {
-        Surface {
-            MessageCard(
-                msg = Message("Lexi", "Hey, take a look at Jetpack Compose")
-            )
-        }
-    }
-}
- */
