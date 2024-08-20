@@ -3,25 +3,30 @@
  */
 package com.example.sunflower
 
+val imageList = listOf(
+    R.drawable.character01,
+    R.drawable.character02,
+    R.drawable.character03,
+    R.drawable.character04
+)
+
 object SampleData {
     // Sample conversation data
     val conversationSample = listOf(
         Message(
             "Lexi",
-            "Test...Test...Test...",
-            "text"
-        ),
-        Message(
-            "User",
-            "나는 뽀로로를 좋아해.",
-            "text"
+            MessageType.TEXT,
+            "Hello AIByeol"
         ),
         Message(
             "Lexi",
-            """네가 좋아할 만한 캐릭터를 생성해 봤어.
-            |마음에 드니?""".trim(),
-            "imageGrid"
+            MessageType.IMAGE_GRID,
+            imageIds = imageList
         ),
-
+        Message(
+            "User",
+            MessageType.TEXT,
+            "나는 뽀로로를 좋아해."
+        )
     )
 }
