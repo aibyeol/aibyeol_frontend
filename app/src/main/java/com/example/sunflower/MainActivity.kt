@@ -1,6 +1,9 @@
 package com.example.sunflower
 
 import android.os.Bundle
+import android.util.Log
+import android.content.Context
+
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -39,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.widget.Toast
 import androidx.compose.runtime.LaunchedEffect
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -86,12 +90,13 @@ object ApiService {
 }
 */
 val retrofit = Retrofit.Builder()
-    .baseUrl("https://your-api-base-url")
+    .baseUrl("http://3.35.89.10:8000")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
 @Composable
 fun MessageCard(msg: Message) {
+    val context = LocalContext.current
     // Add padding around our message
     Row (
         modifier = Modifier
@@ -140,6 +145,7 @@ fun MessageCard(msg: Message) {
                 when (msg.messageType) {
                     MessageType.IMAGE_GRID -> ImageGrid(){ index ->
                         selectedImageIndex.value = index
+                        //Log.d("imagegrid", "imgedid is $index")
                     }
                     MessageType.TEXT -> Text(
                         text = msg.text!!,
@@ -162,9 +168,20 @@ fun MessageCard(msg: Message) {
                             val response = apiService.sendImageSelection(
                                 ImageSelectionData(imageId)
                             )
+                            if (response.isSuccessful) {
+                                val responseData = response.body() as? ImageSelectionData ?: return@LaunchedEffect
+                                // Do something with the successful response data (e.g., show a confirmation toast)
+                                Toast.makeText(context, responseData.imageId.toString(), Toast.LENGTH_SHORT).show()
+                                Log.e("MessageCard", "Connection Successful")
+                            } else {
+                                // Handle the error response
+                                val errorBody = response.errorBody()?.string()
+                                Log.e("MessageCard", "Error sending image selection: $errorBody")
+                            }
                             // 서버 응답 처리
                         } catch (e: Exception) {
                             // 에러 처리
+                            Log.e("MessageCard", "Connection Dismissed")
                         }
                     }
                 }
@@ -194,7 +211,9 @@ fun ImageGrid(columns: Int = 2, onImageSelected: (Int) -> Unit) {
                         modifier = Modifier
                             .fillMaxSize()
                             .clickable {
-                                onImageSelected(column * columns + index)
+                                val selectedIndex = column * columns + index
+                                Log.d("ImageGrid", "Selected image index: $selectedIndex")
+                                onImageSelected(selectedIndex)
                             }
                     )
                 }
