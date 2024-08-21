@@ -5,6 +5,6 @@ import retrofit2.http.POST
 import retrofit2.Response
 
 interface ApiService {
-    @POST("api/images/select")
+    @POST("/user/select")
     suspend fun sendImageSelection(@Body data: ImageSelectionData): Response<ImageSelectionResponse>
 }

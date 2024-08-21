@@ -1,10 +1,11 @@
 package com.example.sunflower
+import com.google.gson.annotations.SerializedName
 
 data class ImageSelectionData (
-    val imageId: Int
+    val imageName: String
 )
 
 data class ImageSelectionResponse(
-    val success: Boolean,
-    val message: String
+    @SerializedName("character")
+    val character: String
 )

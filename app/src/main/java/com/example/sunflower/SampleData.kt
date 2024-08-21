@@ -10,6 +10,13 @@ val imageList = listOf(
     R.drawable.character04
 )
 
+val imageNames = listOf(
+    "heartsping_default",
+    "pinkpong_default",
+    "poly_default",
+    "pororo_default"
+)
+
 object SampleData {
     // Sample conversation data
     val conversationSample = listOf(

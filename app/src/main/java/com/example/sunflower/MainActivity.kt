@@ -162,16 +162,16 @@ fun MessageCard(msg: Message) {
                 val apiService = retrofit.create(ApiService::class.java)
                 LaunchedEffect(selectedImageIndex.value) {
                     if (selectedImageIndex.value != -1) {
-                        val imageId = imageList[selectedImageIndex.value]
-                        //val imageName:
+                        //val imageId = imageList[selectedImageIndex.value]
+                        val imageName = imageNames[selectedImageIndex.value]
                         try {
                             val response = apiService.sendImageSelection(
-                                ImageSelectionData(imageId)
+                                ImageSelectionData(imageName)
                             )
                             if (response.isSuccessful) {
                                 val responseData = response.body() as? ImageSelectionData ?: return@LaunchedEffect
                                 // Do something with the successful response data (e.g., show a confirmation toast)
-                                Toast.makeText(context, responseData.imageId.toString(), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, responseData.imageName, Toast.LENGTH_SHORT).show()
                                 Log.e("MessageCard", "Connection Successful")
                             } else {
                                 // Handle the error response
