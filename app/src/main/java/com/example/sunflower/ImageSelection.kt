@@ -6,6 +6,6 @@ data class ImageSelectionData (
 )
 
 data class ImageSelectionResponse(
-    @SerializedName("character")
-    val character: String
+    @SerializedName("scenario")
+    val scenario: String
 )

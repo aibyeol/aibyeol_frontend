@@ -2,7 +2,11 @@ package com.example.sunflower
 
 import android.os.Bundle
 import android.util.Log
+import android.graphics.Bitmap
+import android.os.Environment
+
 import android.content.Context
+import android.content.Intent
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -42,10 +46,26 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.net.Uri
+import androidx.core.content.FileProvider
 import android.widget.Toast
+import androidx.compose.material3.Button
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import coil.imageLoader
+import coil.request.ImageRequest
+import coil.request.ImageResult
+import coil.transform.CircleCropTransformation
+import java.io.File
+import java.io.FileOutputStream
+
 import com.example.sunflower.ui.theme.SunflowerTheme
 import com.example.sunflower.ApiService
 import kotlinx.coroutines.CoroutineScope
@@ -102,6 +122,42 @@ val retrofit = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create())
     .client(okHttpClient)
     .build()
+
+@Composable
+fun UrlDisplayScreen(url: String) {
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = url)
+        // URL을 클릭하면 해당 URL로 이동하도록 설정
+        Button(onClick = {
+            // URL을 열기 위한 Intent 생성
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            context.startActivity(intent)
+        }) {
+            Text(text = "URL 열기")
+        }
+    }
+}
+
+@Composable
+fun MyNavigation() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "Conversation") {
+        composable("Conversation") {
+             {
+                Conversation(SampleData.conversationSample)
+            }
+        }
+        composable("url_display_screen/{url}") { backStackEntry ->
+            val url = backStackEntry.arguments?.getString("url") ?: ""
+            UrlDisplayScreen(url)
+        }
+    }
+}
 
 @Composable
 fun MessageCard(msg: Message) {
@@ -184,8 +240,8 @@ fun MessageCard(msg: Message) {
                                 Log.e("MessageCard", "Connection Successful")
                                 val responseData = response.body()?: return@LaunchedEffect
                                 // Do something with the successful response data (e.g., show a confirmation toast)
-                                Toast.makeText(context, responseData.character, Toast.LENGTH_SHORT).show()
-
+                                // 이미지 URL을 저장할 파일 경로 생성
+                                Log.d("MessageCard", "Image URL received: $responseData")
                             } else {
                                 // Handle the error response
                                 val errorBody = response.errorBody()?.string()
