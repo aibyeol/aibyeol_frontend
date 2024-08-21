@@ -52,7 +52,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
+import okhttp3.OkHttpClient
 import retrofit2.http.POST
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,9 +92,15 @@ object ApiService {
     }
 }
 */
+val okHttpClient = OkHttpClient.Builder()
+    .connectTimeout(10, TimeUnit.SECONDS) // Set connection timeout to 10 seconds (you can adjust this value)
+    .readTimeout(20, TimeUnit.SECONDS) // Set read timeout to 20 seconds (you can adjust this value)
+    .build()
+
 val retrofit = Retrofit.Builder()
-    .baseUrl("http://3.35.89.10:8000")
+    .baseUrl("http://3.35.89.10:8000/")
     .addConverterFactory(GsonConverterFactory.create())
+    .client(okHttpClient)
     .build()
 
 @Composable
@@ -164,24 +173,31 @@ fun MessageCard(msg: Message) {
                     if (selectedImageIndex.value != -1) {
                         //val imageId = imageList[selectedImageIndex.value]
                         val imageName = imageNames[selectedImageIndex.value]
+                        Log.d("Network", "selectedImageIndex: $selectedImageIndex, imageName: $imageName")
                         try {
+                            Log.d("Network", "Sending request")
                             val response = apiService.sendImageSelection(
                                 ImageSelectionData(imageName)
                             )
+
                             if (response.isSuccessful) {
-                                val responseData = response.body() as? ImageSelectionData ?: return@LaunchedEffect
-                                // Do something with the successful response data (e.g., show a confirmation toast)
-                                Toast.makeText(context, responseData.imageName, Toast.LENGTH_SHORT).show()
                                 Log.e("MessageCard", "Connection Successful")
+                                val responseData = response.body()?: return@LaunchedEffect
+                                // Do something with the successful response data (e.g., show a confirmation toast)
+                                Toast.makeText(context, responseData.character, Toast.LENGTH_SHORT).show()
+
                             } else {
                                 // Handle the error response
                                 val errorBody = response.errorBody()?.string()
                                 Log.e("MessageCard", "Error sending image selection: $errorBody")
                             }
                             // 서버 응답 처리
+                        } catch (e: IOException) {
+                            // 네트워크 오류 처리
+                            Log.e("NetworkError", "IOException: ${e.message}")
                         } catch (e: Exception) {
-                            // 에러 처리
-                            Log.e("MessageCard", "Connection Dismissed")
+                            // 기타 예외 처리
+                            Log.e("NetworkError", "Unknown error: ${e.message}")
                         }
                     }
                 }

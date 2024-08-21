@@ -2,7 +2,7 @@ package com.example.sunflower
 import com.google.gson.annotations.SerializedName
 
 data class ImageSelectionData (
-    val imageName: String
+    val character: String
 )
 
 data class ImageSelectionResponse(
