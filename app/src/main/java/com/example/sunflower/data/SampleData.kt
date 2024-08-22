@@ -1,7 +1,11 @@
 /**
  * SampleData for Jetpack Compose Tutorial 
  */
-package com.example.sunflower
+package com.example.sunflower.data
+
+import com.example.sunflower.R
+import com.example.sunflower.ui.screen.Message
+import com.example.sunflower.ui.screen.MessageType
 
 val imageList = listOf(
     R.drawable.character01,

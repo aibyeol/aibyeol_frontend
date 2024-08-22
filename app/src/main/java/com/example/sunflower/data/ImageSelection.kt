@@ -1,4 +1,4 @@
-package com.example.sunflower
+package com.example.sunflower.data
 import com.google.gson.annotations.SerializedName
 
 data class ImageSelectionData (

@@ -1,4 +1,4 @@
-package com.example.sunflower
+package com.example.sunflower.data
 
 import retrofit2.http.Body
 import retrofit2.http.POST
