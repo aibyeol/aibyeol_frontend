@@ -42,7 +42,7 @@ fun SunflowerAppBar(
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
-        title = { Text("선호도 조사") },
+        title = { Text("아이별_demo") },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
@@ -59,7 +59,6 @@ fun SunflowerAppBar(
         }
     )
 }
-
 
 /**
  * [StudyViewModel]은 설문과 학습 정보 등 앱 실행 과정에서 발생하는 각종 데이터를 저장합니다.

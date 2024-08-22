@@ -1,6 +1,7 @@
 package com.example.sunflower.ui.screen
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -193,6 +194,7 @@ fun MessageCard(msg: Message) {
                                 // Do something with the successful response data (e.g., show a confirmation toast)
                                 // 이미지 URL을 저장할 파일 경로 생성
                                 Log.d("MessageCard", "Image URL received: $responseData")
+                                Toast.makeText(context, "Image Download Successful", Toast.LENGTH_SHORT).show()
                             } else {
                                 // Handle the error response
                                 val errorBody = response.errorBody()?.string()
