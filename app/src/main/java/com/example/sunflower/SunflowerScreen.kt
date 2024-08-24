@@ -1,5 +1,6 @@
 package com.example.sunflower
 
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -22,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.sunflower.data.SampleData
+import com.example.sunflower.ui.screen.RecordingViewModel
 import com.example.sunflower.ui.screen.StudyScreen
 import com.example.sunflower.ui.screen.StudyViewModel
 import com.example.sunflower.ui.screen.SurveyScreen
@@ -67,8 +69,8 @@ fun SunflowerAppBar(
  */
 @Composable
 fun SunflowerApp(
-    viewModel: StudyViewModel = viewModel(),
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    recordingViewModel: RecordingViewModel
 ) {
     Scaffold(
         topBar = {
@@ -79,7 +81,10 @@ fun SunflowerApp(
         }
     ) {
             innerPadding ->
-        val uiState by viewModel.uiState.collectAsState()
+        /**
+         * uiState를 저장했던 예전 viewModel의 잔재. 추후 RecordingViewModel에 통합될 수 있음.
+         */
+        //val uiState by viewModel.uiState.collectAsState()
         NavHost(
             navController = navController,
             startDestination = SunflowerScreen.Survey.name,
@@ -103,7 +108,8 @@ fun SunflowerApp(
                     },
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp)
+                        .padding(16.dp),
+                    recordingViewModel = recordingViewModel
                 )
             }
         }

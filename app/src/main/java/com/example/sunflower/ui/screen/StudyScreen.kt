@@ -11,11 +11,9 @@ import android.media.MediaRecorder
 import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.LinearLayout
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -48,6 +47,7 @@ import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.core.content.PermissionChecker.checkSelfPermission
+import androidx.lifecycle.ViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.sunflower.R
@@ -72,8 +72,11 @@ fun StudyScreen(
     modifier : Modifier = Modifier,
     downloadImageUrl: String,
     onNextButtonClicked: () -> Unit = {},
+    recordingViewModel: RecordingViewModel
 ) {
     val context = LocalContext.current
+    var isRecording by remember { mutableStateOf(false) }
+
 
     Column(
         modifier = modifier,
@@ -102,20 +105,16 @@ fun StudyScreen(
                 style = MaterialTheme.typography.headlineSmall
             )
             Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = {
+                recordingViewModel.startRecording(context)
+            }) {
+                Text(text = "녹음 시작")
+            }
+            Button(onClick = {
+                recordingViewModel.stopRecording()
+            }) {
+                Text(text = "녹음 끝")
+            }
         }
-    }
-}
-
-@Preview
-@Composable
-fun StartPreview() {
-    SunflowerTheme {
-        StudyScreen(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            downloadImageUrl = "",
-            onNextButtonClicked = {},
-        )
     }
 }
