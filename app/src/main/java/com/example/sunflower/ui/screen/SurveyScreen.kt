@@ -82,8 +82,13 @@ val retrofit = Retrofit.Builder()
 @Composable
 fun SurveyScreen(
     modifier: Modifier = Modifier,
+<<<<<<< HEAD
     messages: List<Message>,
     onNextButtonClicked: () -> Unit = {},
+=======
+    messages: List<Message>, // SampleData.conversationSample이 이 List를 채우는 역할을 함
+    onNextButtonClicked: () -> Unit // 이 매개변수를 추가하여 버튼 클릭 시 다음 화면으로 이동 가능
+>>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
 ) {
     Column(
         modifier = modifier,
@@ -98,12 +103,20 @@ fun SurveyScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
+<<<<<<< HEAD
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.Bottom
         ) {
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = onNextButtonClicked
+=======
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = onNextButtonClicked // 버튼 클릭 시 onNextButtonClicked 호출
+>>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
             ) {
                 Text("Next")
             }
@@ -122,7 +135,11 @@ fun MessageCard(msg: Message) {
         horizontalArrangement = if (msg.author == "User") Arrangement.End else Arrangement.Start) {
         if (msg.author != "User") {
             Image(
+<<<<<<< HEAD
                 painter = painterResource(R.drawable.profile_picture),
+=======
+                painter = painterResource(R.drawable.star_icon),
+>>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
                 contentDescription = "Contact profile picture",
                 modifier = Modifier
                     // Set image size to 40 dp

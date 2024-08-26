@@ -25,12 +25,21 @@ object SampleData {
     // Sample conversation data
     val conversationSample = listOf(
         Message(
+<<<<<<< HEAD
             "Lexi",
             MessageType.TEXT,
             "Hello AIByeol"
         ),
         Message(
             "Lexi",
+=======
+            "Aibyeol",
+            MessageType.TEXT,
+            "캐릭터를 선택해주세요"
+        ),
+        Message(
+            "Aibyeol",
+>>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
             MessageType.IMAGE_GRID,
             imageIds = imageList
         ),

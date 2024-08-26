@@ -54,6 +54,11 @@ import com.example.sunflower.R
 import com.example.sunflower.ui.theme.SunflowerTheme
 import java.io.File
 import java.io.IOException
+<<<<<<< HEAD
+=======
+import androidx.navigation.NavController // NavController import 추가
+import com.example.sunflower.SunflowerScreen // SunflowerScreen import 추가
+>>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
 
 @Composable
 fun DownloadImage(downloadImageUrl: String) {
@@ -69,17 +74,28 @@ fun DownloadImage(downloadImageUrl: String) {
 
 @Composable
 fun StudyScreen(
+<<<<<<< HEAD
     modifier : Modifier = Modifier,
     downloadImageUrl: String,
     onNextButtonClicked: () -> Unit = {},
+=======
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    downloadImageUrl: String,
+>>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
     recordingViewModel: RecordingViewModel
 ) {
     val context = LocalContext.current
     var isRecording by remember { mutableStateOf(false) }
 
+<<<<<<< HEAD
 
     Column(
         modifier = modifier,
+=======
+    Column(
+        modifier = modifier.fillMaxSize().padding(16.dp),
+>>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
@@ -88,6 +104,7 @@ fun StudyScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
+<<<<<<< HEAD
             /**
              * 로컬에 저장된 이미지를 띄우는 간단한 테스트 코드입니다.
              */
@@ -100,10 +117,19 @@ fun StudyScreen(
             */
             DownloadImage("http://mars.jpl.nasa.gov/msl-raw-images/msss/01000/mcam/1000ML0044631300305227E03_DXXX.jpg")
             Spacer(modifier = Modifier.height(16.dp))
+=======
+
+            // Image 다운로드 및 표시
+            DownloadImage(downloadImageUrl)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+>>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
             Text(
                 text = "hello study",
                 style = MaterialTheme.typography.headlineSmall
             )
+<<<<<<< HEAD
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = {
                 recordingViewModel.startRecording(context)
@@ -115,6 +141,29 @@ fun StudyScreen(
             }) {
                 Text(text = "녹음 끝")
             }
+=======
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(onClick = { recordingViewModel.startRecording(context) }) {
+                Text(text = "녹음 시작")
+            }
+
+            Button(onClick = { recordingViewModel.stopRecording() }) {
+                Text(text = "녹음 끝")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Next 버튼 추가
+            Button(
+                onClick = {
+                    navController.navigate(SunflowerScreen.User.name) // 원하는 다른 화면으로 네비게이션
+                }
+            ) {
+                Text("Next")
+            }
+>>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
         }
     }
 }
