@@ -34,12 +34,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.sunflower.data.ApiService
-import com.example.sunflower.data.ImageSelectionData
+import com.example.sunflower.data.api.ApiService
+import com.example.sunflower.data.repository.ImageSelectionData
 import com.example.sunflower.R
-import com.example.sunflower.data.SampleData
-import com.example.sunflower.data.imageList
-import com.example.sunflower.data.imageNames
+import com.example.sunflower.data.api.ApiServiceSingleton
+import com.example.sunflower.data.repository.SampleData
+import com.example.sunflower.data.repository.imageList
+import com.example.sunflower.data.repository.imageNames
 import com.example.sunflower.ui.theme.SunflowerTheme
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -63,21 +64,6 @@ enum class MessageType {
     IMAGE,
     IMAGE_GRID
 }
-/**
- * 네트워크 관련 자료
- * 선호 캐릭터 선택 후 서버에서 이에 맞는 이미지 생성에 시간이 걸리기 때문에 커스텀 타임아웃을 적용했습니다.
- * retrofit의 baseUrl은 백엔드 서버 주소입니다.
- */
-val okHttpClient = OkHttpClient.Builder()
-    .connectTimeout(10, TimeUnit.SECONDS) // Set connection timeout to 10 seconds (you can adjust this value)
-    .readTimeout(20, TimeUnit.SECONDS) // Set read timeout to 20 seconds (you can adjust this value)
-    .build()
-
-val retrofit = Retrofit.Builder()
-    .baseUrl("http://3.35.89.10:8000/")
-    .addConverterFactory(GsonConverterFactory.create())
-    .client(okHttpClient)
-    .build()
 
 @Composable
 fun SurveyScreen(
@@ -176,7 +162,7 @@ fun MessageCard(msg: Message) {
                     )
                 }
 
-                val apiService = retrofit.create(ApiService::class.java)
+                val apiService by lazy { ApiServiceSingleton.apiService }
                 LaunchedEffect(selectedImageIndex.value) {
                     if (selectedImageIndex.value != -1) {
                         //val imageId = imageList[selectedImageIndex.value]

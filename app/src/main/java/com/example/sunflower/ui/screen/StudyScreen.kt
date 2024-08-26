@@ -48,10 +48,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.sunflower.R
 import com.example.sunflower.ui.theme.SunflowerTheme
+import com.example.sunflower.ui.viewModel.RecordingViewModel
 import java.io.File
 import java.io.IOException
 
@@ -72,10 +74,12 @@ fun StudyScreen(
     modifier : Modifier = Modifier,
     downloadImageUrl: String,
     onNextButtonClicked: () -> Unit = {},
-    recordingViewModel: RecordingViewModel
+    //recordingViewModel: RecordingViewModel
 ) {
     val context = LocalContext.current
     var isRecording by remember { mutableStateOf(false) }
+    //added for viewModelManager
+    val viewModel = viewModel<RecordingViewModel>()
 
 
     Column(
@@ -106,14 +110,25 @@ fun StudyScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = {
-                recordingViewModel.startRecording(context)
+                viewModel.startRecording(context)
             }) {
                 Text(text = "녹음 시작")
             }
             Button(onClick = {
-                recordingViewModel.stopRecording()
+                viewModel.stopRecording()
             }) {
                 Text(text = "녹음 끝")
+            }
+            Button(onClick = {
+                viewModel.startPlayback()
+            }) {
+                Text(text = "재생 시작")
+            }
+            Button(onClick = {
+                viewModel.stopPlayback()
+                viewModel.sendRecordingToServer()
+            }) {
+                Text(text = "재생 끝")
             }
         }
     }

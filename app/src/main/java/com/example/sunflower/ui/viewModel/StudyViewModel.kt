@@ -1,7 +1,7 @@
-package com.example.sunflower.ui.screen
+package com.example.sunflower.ui.viewModel
 
 import androidx.lifecycle.ViewModel
-import com.example.sunflower.data.StudyUiState
+import com.example.sunflower.data.repository.StudyUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

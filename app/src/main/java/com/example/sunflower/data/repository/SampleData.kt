@@ -1,7 +1,7 @@
 /**
  * SampleData for Jetpack Compose Tutorial 
  */
-package com.example.sunflower.data
+package com.example.sunflower.data.repository
 
 import com.example.sunflower.R
 import com.example.sunflower.ui.screen.Message

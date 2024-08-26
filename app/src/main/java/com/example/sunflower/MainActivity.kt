@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import com.example.sunflower.ui.screen.RecordingViewModel
+import com.example.sunflower.ui.viewModel.RecordingViewModel
 
 import com.example.sunflower.ui.theme.SunflowerTheme
 
@@ -15,7 +15,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SunflowerTheme {
-                SunflowerApp( recordingViewModel = recordingViewModel )
+                //SunflowerApp( recordingViewModel = recordingViewModel )
+                SunflowerApp()
             }
         }
     }

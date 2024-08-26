@@ -1,6 +1,5 @@
 package com.example.sunflower
 
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -13,19 +12,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.sunflower.data.SampleData
-import com.example.sunflower.ui.screen.RecordingViewModel
+import com.example.sunflower.data.repository.SampleData
 import com.example.sunflower.ui.screen.StudyScreen
-import com.example.sunflower.ui.screen.StudyViewModel
+import com.example.sunflower.ui.viewModel.StudyViewModel
 import com.example.sunflower.ui.screen.SurveyScreen
 
 /**
@@ -70,7 +65,7 @@ fun SunflowerAppBar(
 @Composable
 fun SunflowerApp(
     navController: NavHostController = rememberNavController(),
-    recordingViewModel: RecordingViewModel
+    //recordingViewModel: RecordingViewModel
 ) {
     Scaffold(
         topBar = {
@@ -109,7 +104,7 @@ fun SunflowerApp(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
-                    recordingViewModel = recordingViewModel
+                    //viewModel = recordingViewModel
                 )
             }
         }
