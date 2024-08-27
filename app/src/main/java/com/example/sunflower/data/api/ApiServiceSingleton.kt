@@ -3,6 +3,7 @@ package com.example.sunflower.data.api
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import java.util.concurrent.TimeUnit
 
 
@@ -18,6 +19,7 @@ class ApiServiceSingleton {
             Retrofit.Builder()
                 .baseUrl("http://3.35.89.10:8000/")
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .client(okHttpClient)
                 .build()
         }

@@ -22,6 +22,8 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okio.Okio
+import okio.sink
 import java.io.File
 import java.io.IOException
 
@@ -98,14 +100,15 @@ class RecordingViewModel() : ViewModel() {
         val timestamp = System.currentTimeMillis()
         val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_MUSIC) ?: return ""
         Log.d("MediaRecorder", "External FilePath $storageDir")
-        return File(storageDir, "recording_$timestamp.3gp").absolutePath
+        return File(storageDir, "recording_$timestamp.mp3").absolutePath
     }
 
-    fun startPlayback() {
+    fun startPlayback(savedFilePath: String = fileName) {
+
         if (playbackMediaPlayer == null) {
             playbackMediaPlayer = MediaPlayer().apply {
                 try {
-                    setDataSource(fileName)
+                    setDataSource(savedFilePath)
                     prepareAsync() // Prepare asynchronously to avoid blocking UI thread
                     setOnPreparedListener { MediaPlayer ->
                         MediaPlayer.start()
@@ -152,18 +155,30 @@ class RecordingViewModel() : ViewModel() {
         val file = File(fileName)
 
         val requestBody =
-            file.asRequestBody("audio/3gp".toMediaTypeOrNull()) // "image/jpeg".toMediaType() 로 변경
+            file.asRequestBody("audio/mp3".toMediaTypeOrNull()) // "image/jpeg".toMediaType() 로 변경
         val multipartBody = MultipartBody.Part.createFormData("audio", file.name, requestBody)
+        Log.d("RecordingViewModel", "File is $file")
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = apiService.uploadAudio(multipartBody)
                 if (response.isSuccessful) {
+                    val source = response.body()?.source()
+                    val buffer = source?.buffer
+                    val tempFile = File.createTempFile("audio", ".mp3")
+                    val sink = tempFile.sink()
+                    buffer?.use {
+                        sink.use {
+                            buffer.readAll(sink)
+                        }
+                    }
                     // 서버로부터 성공 응답 받은 경우 처리
-                    Log.d("RecordingViewModel", "Upload successful")
+                    Log.d("RecordingViewModel", "Successfully Received AudioFile")
                     // 업로드 성공 시 필요한 작업 수행 (예: 토스트 메시지 표시)
                     withContext(Dispatchers.Main) {
-                        _recordingState.value = RecordingState.Stopped
+                        stopPlayback()
+                        startPlayback(tempFile.absolutePath)
+                        _recordingState.value = RecordingState.PlayingDownloadedFile
                     }
                 } else {
                     // 서버로부터 에러 응답 받은 경우 처리
@@ -186,5 +201,6 @@ class RecordingViewModel() : ViewModel() {
         data class Error(val message: String?) : RecordingState()
         object Stopped : RecordingState()
         object Playing : RecordingState()
+        object PlayingDownloadedFile : RecordingState()
     }
 }
