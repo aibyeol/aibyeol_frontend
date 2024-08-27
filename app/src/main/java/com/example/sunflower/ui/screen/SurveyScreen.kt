@@ -25,8 +25,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -71,15 +73,14 @@ fun SurveyScreen(
     messages: List<Message>,
     onNextButtonClicked: () -> Unit = {},
 ) {
+    var currentIndex by remember { mutableStateOf(0) }
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        LazyColumn {
-            items(messages) { message ->
-                MessageCard(message)
-            }
-        }
+        MessageCard(messages[currentIndex])
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -89,7 +90,13 @@ fun SurveyScreen(
         ) {
             Button(
                 modifier = Modifier.weight(1f),
-                onClick = onNextButtonClicked
+                onClick = {
+                    if (currentIndex < messages.size - 1) {
+                        currentIndex++
+                    } else {
+                        onNextButtonClicked()
+                    }
+                }
             ) {
                 Text("Next")
             }
@@ -213,7 +220,7 @@ fun ImageGrid(columns: Int = 2, onImageSelected: (Int) -> Unit) {
                         painter = painterResource(id = imageId),
                         contentDescription = null,
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxWidth()
                             .clickable {
                                 val selectedIndex = column * columns + index
                                 Log.d("ImageGrid", "Selected image index: $selectedIndex")
