@@ -74,12 +74,21 @@ fun SurveyScreen(
     onNextButtonClicked: () -> Unit = {},
 ) {
     var currentIndex by remember { mutableStateOf(0) }
+    var isButtonEnabled by remember { mutableStateOf(true) }
 
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        MessageCard(messages[currentIndex])
+        MessageCard(
+            msg = messages[currentIndex],
+            onImageGridDisplayed = { isDisplayed ->
+                isButtonEnabled = !isDisplayed
+            },
+            onResponseReceived = { isSuccessful ->
+                isButtonEnabled = isSuccessful
+            }
+        )
 
         Row(
             modifier = Modifier
@@ -96,7 +105,8 @@ fun SurveyScreen(
                     } else {
                         onNextButtonClicked()
                     }
-                }
+                },
+                enabled = isButtonEnabled
             ) {
                 Text("Next")
             }
@@ -105,8 +115,13 @@ fun SurveyScreen(
 }
 
 @Composable
-fun MessageCard(msg: Message) {
+fun MessageCard(
+    msg: Message,
+    onImageGridDisplayed: (Boolean) -> Unit,
+    onResponseReceived: (Boolean) -> Unit
+) {
     val context = LocalContext.current
+    val selectedImageIndex = remember { mutableStateOf(-1) }
     // Add padding around our message
     Row (
         modifier = Modifier
@@ -151,22 +166,31 @@ fun MessageCard(msg: Message) {
                     .animateContentSize()
                     .padding(1.dp)
             ) {
-                val selectedImageIndex = remember { mutableStateOf(-1) }
                 when (msg.messageType) {
-                    MessageType.IMAGE_GRID -> ImageGrid(){ index ->
-                        selectedImageIndex.value = index
-                        //Log.d("imagegrid", "imgedid is $index")
+                    MessageType.IMAGE_GRID -> {
+                        onImageGridDisplayed(true)
+                        ImageGrid { index ->
+                            selectedImageIndex.value = index
+                            //onImageGridDisplayed(false)
+                            //Log.d("imagegrid", "imgedid is $index")
+                        }
                     }
-                    MessageType.TEXT -> Text(
-                        text = msg.text!!,
-                        modifier = Modifier.padding(all = 4.dp),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    MessageType.IMAGE -> Image(
-                        painter = painterResource(id = msg.imageId!!),
-                        contentDescription = "Message Image",
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
+                    MessageType.TEXT -> {
+                        onImageGridDisplayed(false)
+                        Text(
+                            text = msg.text!!,
+                            modifier = Modifier.padding(all = 4.dp),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    MessageType.IMAGE -> {
+                        onImageGridDisplayed(false)
+                        Image(
+                            painter = painterResource(id = msg.imageId!!),
+                            contentDescription = "Message Image",
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                    }
                 }
 
                 val apiService by lazy { ApiServiceSingleton.apiService }
@@ -188,18 +212,22 @@ fun MessageCard(msg: Message) {
                                 // 이미지 URL을 저장할 파일 경로 생성
                                 Log.d("MessageCard", "Image URL received: $responseData")
                                 Toast.makeText(context, "Image Download Successful", Toast.LENGTH_SHORT).show()
+                                onResponseReceived(true)
                             } else {
                                 // Handle the error response
                                 val errorBody = response.errorBody()?.string()
                                 Log.e("MessageCard", "Error sending image selection: $errorBody")
+                                onResponseReceived(false)
                             }
                             // 서버 응답 처리
                         } catch (e: IOException) {
                             // 네트워크 오류 처리
                             Log.e("NetworkError", "IOException: ${e.message}")
+                            onResponseReceived(false)
                         } catch (e: Exception) {
                             // 기타 예외 처리
                             Log.e("NetworkError", "Unknown error: ${e.message}")
+                            onResponseReceived(false)
                         }
                     }
                 }
