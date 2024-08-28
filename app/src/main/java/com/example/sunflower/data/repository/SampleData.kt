@@ -47,12 +47,18 @@ object SampleData {
         ),
         Message(
             "아이별",
-            MessageType.IMAGE
+            MessageType.IMAGE,
+            scenario = 0
         ),
         Message(
             "User",
-            MessageType.TEXT,
-            "나는 뽀로로를 좋아해."
+            MessageType.IMAGE,
+            scenario = 1
+        ),
+        Message(
+            "아이별",
+            MessageType.IMAGE,
+            scenario = 2
         )
     )
 }

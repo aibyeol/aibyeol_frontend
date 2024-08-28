@@ -73,6 +73,7 @@ data class Message(
     val messageType: MessageType,
     val text: String? = null,
     val imageId: Int? = null,
+    val scenario: Int? = null,
     val imageIds: List<Int>? = null,
     val textIds: List<String>? = null
 )
@@ -88,10 +89,11 @@ fun SurveyScreen(
     modifier: Modifier = Modifier,
     messages: List<Message>,
     onNextButtonClicked: () -> Unit = {},
+    viewModel: SurveyViewModel
 ) {
     var currentIndex by remember { mutableStateOf(0) }
     //var isButtonEnabled by remember { mutableStateOf(true) }
-    val viewModel = viewModel<SurveyViewModel>()
+    //val viewModel = viewModel<SurveyViewModel>()
     val isButtonEnabled by viewModel.isButtonEnabled.observeAsState(initial = false)
 
     LaunchedEffect(currentIndex) {
@@ -230,12 +232,13 @@ fun MessageCard(
                     }
                     MessageType.IMAGE -> {
                         onImageGridDisplayed(false)
-                        val imageUrl by viewModel.imageUrls.observeAsState()
+                        val scenarioUrl by viewModel.scenarioUrls.observeAsState()
+                        val scenario = scenarioUrl?.get(msg.scenario!!)
 
-                        Log.d("Image", "Trying to get imageUrl: $imageUrl")
-                        if (imageUrl != null) {
+                        //Log.d("Image", "Trying to get imageUrl: $scenario")
+                        if (scenario != null) {
                             Image(
-                                painter = rememberAsyncImagePainter(imageUrl),
+                                painter = rememberAsyncImagePainter(scenario),
                                 contentDescription = "Message Image",
                                 modifier = Modifier
                                     .padding(bottom = 4.dp)
@@ -285,7 +288,9 @@ fun MessageCard(
                             onResponseReceived(false)
                         }
                     }
+                    selectedImageIndex.value = -1
                 }
+
 
                 //Identity 선택 처리하는 함수
                 LaunchedEffect(selectedIdentityIndex.value) {
@@ -313,8 +318,9 @@ fun MessageCard(
                         try{
                             val response = identityService.sendScenarios()
                             if (response.isNotEmpty()) {
-                                val scenariosResponse = response.map { it.scenarioUrl }
+                                val scenariosResponse = response.map { it.scenario }
                                 viewModel.setScenarioUrls(scenariosResponse)
+                                Log.d("ScenarioFunction", "Received: ${scenariosResponse[0]}")
                             } else {
                                 Log.e("ScenarioFunction", "Response list is empty")
                             }
@@ -326,6 +332,7 @@ fun MessageCard(
                             onResponseReceived(false)
                         }
                     }
+                    selectedIdentityIndex.value = -1
                 }
             }
         }
@@ -380,20 +387,5 @@ fun TextGrid(columns: Int = 2, onTextSelected: (Int) -> Unit) {
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewConversation() {
-    SunflowerTheme {
-        SurveyScreen(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            SampleData.conversationSample,
-            onNextButtonClicked = {},
-
-            )
     }
 }

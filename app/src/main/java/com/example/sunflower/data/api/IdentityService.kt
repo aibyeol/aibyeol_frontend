@@ -7,9 +7,9 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 interface IdentityService {
-    @GET("aibyeol/identity/Bread")
+    @GET("aibyeol/identity/cat")
     suspend fun sendIdentitySelection(): List<IdentitySelectionResponse>
 
-    @GET("aibyeol/scenario/2")
+    @GET("aibyeol/scenario/16")
     suspend fun sendScenarios(): List<ScenariosResponse>
 }

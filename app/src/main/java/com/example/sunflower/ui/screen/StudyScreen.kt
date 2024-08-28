@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -50,10 +52,12 @@ import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.sunflower.R
 import com.example.sunflower.ui.theme.SunflowerTheme
 import com.example.sunflower.ui.viewModel.RecordingViewModel
+import com.example.sunflower.ui.viewModel.SurveyViewModel
 import java.io.File
 import java.io.IOException
 
@@ -72,15 +76,15 @@ fun DownloadImage(downloadImageUrl: String) {
 @Composable
 fun StudyScreen(
     modifier : Modifier = Modifier,
-    downloadImageUrl: String,
     onNextButtonClicked: () -> Unit = {},
+    surveyViewModel: SurveyViewModel = viewModel()
     //recordingViewModel: RecordingViewModel
 ) {
     val context = LocalContext.current
-    var isRecording by remember { mutableStateOf(false) }
+    //var isRecording by remember { mutableStateOf(false) }
     //added for viewModelManager
-    val viewModel = viewModel<RecordingViewModel>()
-
+    val recordingViewModel = viewModel<RecordingViewModel>()
+    val isButtonEnabled by surveyViewModel.isButtonEnabled.observeAsState(initial = false)
 
     Column(
         modifier = modifier,
@@ -102,33 +106,84 @@ fun StudyScreen(
                 modifier = Modifier.width(300.dp)
             )
             */
-            DownloadImage("http://mars.jpl.nasa.gov/msl-raw-images/msss/01000/mcam/1000ML0044631300305227E03_DXXX.jpg")
+            //DownloadImage("http://mars.jpl.nasa.gov/msl-raw-images/msss/01000/mcam/1000ML0044631300305227E03_DXXX.jpg")
+            val scenarioUrl by surveyViewModel.scenarioUrls.observeAsState()
+            val scenario = scenarioUrl?.get(3)
+            if (scenario != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(scenario),
+                    contentDescription = "Message Image",
+                    modifier = Modifier
+                        .padding(bottom = 4.dp)
+                        .size(200.dp)
+                )
+            } else {
+                Text("No Image Available")
+            }
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "hello study",
                 style = MaterialTheme.typography.headlineSmall
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = {
+            /**
+             * 개발용 Recording Row 입니다.
+             */
+            /*
+            Row(
+                modifier = Modifier.padding(horizontal=8.dp)
+            ) {
+                Button(onClick = {
                 viewModel.startRecording(context)
-            }) {
+                }) {
                 Text(text = "녹음 시작")
+                }
+                Button(onClick = {
+                    viewModel.stopRecording()
+                }) {
+                    Text(text = "녹음 끝")
+                }
+                Button(onClick = {
+                    viewModel.startPlayback()
+                }) {
+                    Text(text = "재생 시작")
+                }
+                Button(onClick = {
+                    viewModel.stopPlayback()
+                    viewModel.sendRecordingToServer()
+                }) {
+                    Text(text = "재생 끝")
+                }
             }
-            Button(onClick = {
-                viewModel.stopRecording()
-            }) {
-                Text(text = "녹음 끝")
+            */
+            /**
+             * 실제 Recording Row 입니다.
+             */
+            var currentIndex by remember { mutableStateOf(0) }
+            LaunchedEffect(currentIndex) {
+                surveyViewModel.setButtonEnabled(false)
             }
-            Button(onClick = {
-                viewModel.startPlayback()
-            }) {
-                Text(text = "재생 시작")
-            }
-            Button(onClick = {
-                viewModel.stopPlayback()
-                viewModel.sendRecordingToServer()
-            }) {
-                Text(text = "재생 끝")
+
+            Row(
+                modifier = Modifier.padding(horizontal=8.dp)
+            ) {
+                Button(onClick = {
+                    recordingViewModel.startRecording(context)
+                    surveyViewModel.setButtonEnabled(true) // Enable stop button after start
+                }) {
+                    Text(text = "누르고 이야기하기!")
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = {
+                        recordingViewModel.stopRecording()
+                        recordingViewModel.sendRecordingToServer()
+                        surveyViewModel.setButtonEnabled(false) // Disable stop button after stop
+                    },
+                    enabled = isButtonEnabled
+                ) {
+                    Text(text = "이야기 끝!")
+                }
             }
         }
     }

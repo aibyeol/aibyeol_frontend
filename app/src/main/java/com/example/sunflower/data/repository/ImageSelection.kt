@@ -19,7 +19,7 @@ data class IdentitySelectionResponse(
 )
 
 data class ScenariosResponse(
-    val scenarioUrl: String
+    val scenario: String
 )
 
 data class UploadAudioRequest(

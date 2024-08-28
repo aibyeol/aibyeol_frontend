@@ -14,6 +14,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +23,7 @@ import com.example.sunflower.data.repository.SampleData
 import com.example.sunflower.ui.screen.StudyScreen
 import com.example.sunflower.ui.viewModel.StudyViewModel
 import com.example.sunflower.ui.screen.SurveyScreen
+import com.example.sunflower.ui.viewModel.SurveyViewModel
 
 /**
  * 네이게이션에서 사용할 상태 목록입니다.
@@ -65,8 +67,9 @@ fun SunflowerAppBar(
 @Composable
 fun SunflowerApp(
     navController: NavHostController = rememberNavController(),
-    //recordingViewModel: RecordingViewModel
 ) {
+    val surveyViewModel: SurveyViewModel = viewModel()
+
     Scaffold(
         topBar = {
             SunflowerAppBar(
@@ -91,19 +94,20 @@ fun SunflowerApp(
                     SampleData.conversationSample,
                     onNextButtonClicked = {
                         navController.navigate(SunflowerScreen.Study.name)
-                    }
+                    },
+                    viewModel = surveyViewModel
                 )
             }
 
             composable(route = SunflowerScreen.Study.name) {
                 StudyScreen(
-                    downloadImageUrl = "",
                     onNextButtonClicked = {
                         navController.navigate(SunflowerScreen.Study.name)
                     },
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
+                    surveyViewModel = surveyViewModel
                     //viewModel = recordingViewModel
                 )
             }
