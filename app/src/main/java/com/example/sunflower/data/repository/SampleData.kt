@@ -14,6 +14,13 @@ val imageList = listOf(
     R.drawable.character04
 )
 
+val identityList = listOf(
+    "빵",
+    "뽀로로",
+    "꿀벌",
+    "하츄핑"
+)
+
 val imageNames = listOf(
     "heartsping_default",
     "pinkpong_default",
@@ -28,6 +35,15 @@ object SampleData {
             "Lexi",
             MessageType.TEXT,
             "Hello AIByeol"
+        ),
+        Message(
+            "아이별",
+            MessageType.TEXT_GRID,
+            textIds = identityList
+        ),
+        Message(
+            "아이별",
+            MessageType.IMAGE
         ),
         Message(
             "Lexi",

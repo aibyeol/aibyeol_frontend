@@ -1,5 +1,8 @@
 package com.example.sunflower.ui.screen
 
+import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
+import com.google.gson.reflect.TypeToken
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
@@ -7,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,14 +41,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
+import coil.size.Scale
 import com.example.sunflower.data.api.ApiService
 import com.example.sunflower.data.repository.ImageSelectionData
 import com.example.sunflower.R
 import com.example.sunflower.data.api.ApiServiceSingleton
+import com.example.sunflower.data.api.IdentityServiceSingleton
 import com.example.sunflower.data.repository.SampleData
+import com.example.sunflower.data.repository.identityList
 import com.example.sunflower.data.repository.imageList
 import com.example.sunflower.data.repository.imageNames
 import com.example.sunflower.ui.theme.SunflowerTheme
+import com.example.sunflower.ui.viewModel.RecordingViewModel
+import com.example.sunflower.ui.viewModel.SurveyViewModel
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -59,12 +73,14 @@ data class Message(
     val messageType: MessageType,
     val text: String? = null,
     val imageId: Int? = null,
-    val imageIds: List<Int>? = null
+    val imageIds: List<Int>? = null,
+    val textIds: List<String>? = null
 )
 enum class MessageType {
     TEXT,
     IMAGE,
-    IMAGE_GRID
+    IMAGE_GRID,
+    TEXT_GRID
 }
 
 @Composable
@@ -74,7 +90,18 @@ fun SurveyScreen(
     onNextButtonClicked: () -> Unit = {},
 ) {
     var currentIndex by remember { mutableStateOf(0) }
-    var isButtonEnabled by remember { mutableStateOf(true) }
+    //var isButtonEnabled by remember { mutableStateOf(true) }
+    val viewModel = viewModel<SurveyViewModel>()
+    val isButtonEnabled by viewModel.isButtonEnabled.observeAsState(initial = false)
+
+    LaunchedEffect(currentIndex) {
+        val currentMessage = messages[currentIndex]
+        if (currentMessage.messageType != MessageType.IMAGE_GRID) {
+            viewModel.setButtonEnabled(true)
+        } else {
+            viewModel.setButtonEnabled(false)
+        }
+    }
 
     Column(
         modifier = modifier,
@@ -82,11 +109,10 @@ fun SurveyScreen(
     ) {
         MessageCard(
             msg = messages[currentIndex],
-            onImageGridDisplayed = { isDisplayed ->
-                isButtonEnabled = !isDisplayed
-            },
+            viewModel = viewModel,
+            onImageGridDisplayed = {},
             onResponseReceived = { isSuccessful ->
-                isButtonEnabled = isSuccessful
+                viewModel.setButtonEnabled(isSuccessful)
             }
         )
 
@@ -117,12 +143,15 @@ fun SurveyScreen(
 @Composable
 fun MessageCard(
     msg: Message,
+    viewModel: SurveyViewModel,
     onImageGridDisplayed: (Boolean) -> Unit,
     onResponseReceived: (Boolean) -> Unit
 ) {
     val context = LocalContext.current
     val selectedImageIndex = remember { mutableStateOf(-1) }
-    // Add padding around our message
+    val selectedIdentityIndex = remember { mutableStateOf(-1) }
+
+    //val imageUrl by viewModel.imageUrl.observeAsState()
     Row (
         modifier = Modifier
             .fillMaxWidth()
@@ -169,11 +198,20 @@ fun MessageCard(
                 when (msg.messageType) {
                     MessageType.IMAGE_GRID -> {
                         onImageGridDisplayed(true)
-                        ImageGrid { index ->
-                            selectedImageIndex.value = index
-                            //onImageGridDisplayed(false)
-                            //Log.d("imagegrid", "imgedid is $index")
+                        ImageGrid (
+                            images = msg.imageIds?: emptyList(),
+                            onImageSelected = { index ->
+                                selectedImageIndex.value = index
+                                onImageGridDisplayed(true)
+                            }
+                        )
+                    }
+                    MessageType.TEXT_GRID -> {
+                        onImageGridDisplayed(false)
+                        TextGrid { index ->
+                            selectedIdentityIndex.value = index
                         }
+
                     }
                     MessageType.TEXT -> {
                         onImageGridDisplayed(false)
@@ -185,15 +223,25 @@ fun MessageCard(
                     }
                     MessageType.IMAGE -> {
                         onImageGridDisplayed(false)
-                        Image(
-                            painter = painterResource(id = msg.imageId!!),
-                            contentDescription = "Message Image",
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
+                        val imageUrl by viewModel.imageUrl.observeAsState()
+
+                        Log.d("Image", "Trying to get imageUrl: $imageUrl")
+                        if (imageUrl != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter("https://i.ibb.co/QMVCQg7/2.png"),
+                                contentDescription = "Message Image",
+                                modifier = Modifier
+                                    .padding(bottom = 4.dp)
+                                    .size(200.dp)
+                            )
+                        } else {
+                            Text("No image available")
+                        }
                     }
                 }
 
                 val apiService by lazy { ApiServiceSingleton.apiService }
+                val identityService by lazy { IdentityServiceSingleton.identityService }
                 LaunchedEffect(selectedImageIndex.value) {
                     if (selectedImageIndex.value != -1) {
                         //val imageId = imageList[selectedImageIndex.value]
@@ -231,21 +279,57 @@ fun MessageCard(
                         }
                     }
                 }
+
+                //Identity 선택 처리하는 함수
+                LaunchedEffect(selectedIdentityIndex.value) {
+                    if(selectedIdentityIndex.value != -1) {
+                        //val identityName = identityList[selectedIdentityIndex.value]
+                        try {
+                            Log.d("Network", "Sending request")
+                            val response = identityService.sendIdentitySelection()
+                            if (response.isNotEmpty()) {
+                                val identityResponse = response[selectedIdentityIndex.value]
+                                Log.d("ExampleFunction", "Received: ${identityResponse.id}")
+                                Log.d("ExampleFunction", "Received: ${identityResponse.identity}")
+                                Log.d("ExampleFunction", "Received: ${identityResponse.identityUrl}")
+                                Toast.makeText(context, "Identity Download Successful: ${identityResponse.identity}", Toast.LENGTH_SHORT).show()
+
+                                viewModel.setImageUrl(identityResponse.identityUrl)
+                            } else {
+                                Log.e("ExampleFunction", "Response list is empty")
+                            }
+                        } catch (e: IOException) {
+                            // 네트워크 오류 처리
+                            Log.e("NetworkError", "IOException: ${e.message}")
+                            onResponseReceived(false)
+                        } catch (e: Exception) {
+                            // 기타 예외 처리
+                            Log.e("NetworkError", "Unknown error: ${e.message}")
+                            onResponseReceived(false)
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-
-
 @Composable
-fun ImageGrid(columns: Int = 2, onImageSelected: (Int) -> Unit) {
+fun ImageGrid(columns: Int = 2, onImageSelected: (Int) -> Unit, images: List<Int>) {
     Row {
         repeat(columns) { column ->
             Column(Modifier.weight(1f)) {
-                imageList.chunked(columns)[column].forEachIndexed { index, imageId ->
+                images.chunked(columns)[column].forEachIndexed { index, imageResId ->
+                    val painter = rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(imageResId)
+                            .apply {
+                                scale(Scale.FILL)
+                            }
+                            .build()
+                    )
                     Image(
-                        painter = painterResource(id = imageId),
+                        painter = painter,
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -255,6 +339,29 @@ fun ImageGrid(columns: Int = 2, onImageSelected: (Int) -> Unit) {
                                 onImageSelected(selectedIndex)
                             }
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TextGrid(columns: Int = 2, onTextSelected: (Int) -> Unit) {
+    Row {
+        repeat(columns) { column ->
+            Column(Modifier.weight(1f)) {
+                identityList.chunked(columns)[column].forEachIndexed { index, textId ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                val selectedIndex = column * columns + index
+                                Log.d("TextGrid", "Selected identity index: $selectedIndex")
+                                onTextSelected(selectedIndex)
+                            }
+                    ) {
+                        Text(textId)
+                    }
                 }
             }
         }
@@ -272,6 +379,6 @@ fun PreviewConversation() {
             SampleData.conversationSample,
             onNextButtonClicked = {},
 
-        )
+            )
     }
 }
