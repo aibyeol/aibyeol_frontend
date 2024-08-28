@@ -47,10 +47,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-
-/**
- * SampleData.kt의 conversationsample list 안에 들어있는 데이터입니다.
- **/
 data class Message(
     val author: String,
     val messageType: MessageType,
@@ -58,19 +54,16 @@ data class Message(
     val imageId: Int? = null,
     val imageIds: List<Int>? = null
 )
+
 enum class MessageType {
     TEXT,
     IMAGE,
     IMAGE_GRID
 }
-/**
- * 네트워크 관련 자료
- * 선호 캐릭터 선택 후 서버에서 이에 맞는 이미지 생성에 시간이 걸리기 때문에 커스텀 타임아웃을 적용했습니다.
- * retrofit의 baseUrl은 백엔드 서버 주소입니다.
- */
+
 val okHttpClient = OkHttpClient.Builder()
-    .connectTimeout(10, TimeUnit.SECONDS) // Set connection timeout to 10 seconds (you can adjust this value)
-    .readTimeout(20, TimeUnit.SECONDS) // Set read timeout to 20 seconds (you can adjust this value)
+    .connectTimeout(10, TimeUnit.SECONDS)
+    .readTimeout(20, TimeUnit.SECONDS)
     .build()
 
 val retrofit = Retrofit.Builder()
@@ -82,19 +75,16 @@ val retrofit = Retrofit.Builder()
 @Composable
 fun SurveyScreen(
     modifier: Modifier = Modifier,
-<<<<<<< HEAD
     messages: List<Message>,
-    onNextButtonClicked: () -> Unit = {},
-=======
-    messages: List<Message>, // SampleData.conversationSample이 이 List를 채우는 역할을 함
-    onNextButtonClicked: () -> Unit // 이 매개변수를 추가하여 버튼 클릭 시 다음 화면으로 이동 가능
->>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
+    onNextButtonClicked: () -> Unit
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier.weight(1f)
+        ) {
             items(messages) { message ->
                 MessageCard(message)
             }
@@ -103,20 +93,12 @@ fun SurveyScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-<<<<<<< HEAD
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.Bottom
         ) {
             Button(
                 modifier = Modifier.weight(1f),
                 onClick = onNextButtonClicked
-=======
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = onNextButtonClicked // 버튼 클릭 시 onNextButtonClicked 호출
->>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
             ) {
                 Text("Next")
             }
@@ -127,30 +109,22 @@ fun SurveyScreen(
 @Composable
 fun MessageCard(msg: Message) {
     val context = LocalContext.current
-    // Add padding around our message
-    Row (
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(all = 8.dp),
-        horizontalArrangement = if (msg.author == "User") Arrangement.End else Arrangement.Start) {
+        horizontalArrangement = if (msg.author == "User") Arrangement.End else Arrangement.Start
+    ) {
         if (msg.author != "User") {
             Image(
-<<<<<<< HEAD
                 painter = painterResource(R.drawable.profile_picture),
-=======
-                painter = painterResource(R.drawable.star_icon),
->>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
                 contentDescription = "Contact profile picture",
                 modifier = Modifier
-                    // Set image size to 40 dp
                     .size(40.dp)
-                    //clip image to be shaped as a circle
                     .clip(CircleShape)
-                    //set image border
                     .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
             )
 
-            // Add a horizontal space between the image and the column
             Spacer(modifier = Modifier.width(8.dp))
         }
 
@@ -160,7 +134,6 @@ fun MessageCard(msg: Message) {
                 color = MaterialTheme.colorScheme.secondary,
                 style = MaterialTheme.typography.titleSmall
             )
-            // Add a vertical space between the author and message texts
             Spacer(modifier = Modifier.height(4.dp))
 
             Surface(
@@ -177,17 +150,16 @@ fun MessageCard(msg: Message) {
             ) {
                 val selectedImageIndex = remember { mutableStateOf(-1) }
                 when (msg.messageType) {
-                    MessageType.IMAGE_GRID -> ImageGrid(){ index ->
+                    MessageType.IMAGE_GRID -> ImageGrid { index ->
                         selectedImageIndex.value = index
-                        //Log.d("imagegrid", "imgedid is $index")
                     }
                     MessageType.TEXT -> Text(
-                        text = msg.text!!,
+                        text = msg.text ?: "",
                         modifier = Modifier.padding(all = 4.dp),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     MessageType.IMAGE -> Image(
-                        painter = painterResource(id = msg.imageId!!),
+                        painter = painterResource(id = msg.imageId ?: R.drawable.placeholder),
                         contentDescription = "Message Image",
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
@@ -196,33 +168,25 @@ fun MessageCard(msg: Message) {
                 val apiService = retrofit.create(ApiService::class.java)
                 LaunchedEffect(selectedImageIndex.value) {
                     if (selectedImageIndex.value != -1) {
-                        //val imageId = imageList[selectedImageIndex.value]
                         val imageName = imageNames[selectedImageIndex.value]
-                        Log.d("Network", "selectedImageIndex: $selectedImageIndex, imageName: $imageName")
+                        Log.d("Network", "selectedImageIndex: ${selectedImageIndex.value}, imageName: $imageName")
                         try {
-                            Log.d("Network", "Sending request")
                             val response = apiService.sendImageSelection(
                                 ImageSelectionData(imageName)
                             )
 
                             if (response.isSuccessful) {
                                 Log.e("MessageCard", "Connection Successful")
-                                val responseData = response.body()?: return@LaunchedEffect
-                                // Do something with the successful response data (e.g., show a confirmation toast)
-                                // 이미지 URL을 저장할 파일 경로 생성
+                                val responseData = response.body() ?: return@LaunchedEffect
                                 Log.d("MessageCard", "Image URL received: $responseData")
                                 Toast.makeText(context, "Image Download Successful", Toast.LENGTH_SHORT).show()
                             } else {
-                                // Handle the error response
                                 val errorBody = response.errorBody()?.string()
                                 Log.e("MessageCard", "Error sending image selection: $errorBody")
                             }
-                            // 서버 응답 처리
                         } catch (e: IOException) {
-                            // 네트워크 오류 처리
                             Log.e("NetworkError", "IOException: ${e.message}")
                         } catch (e: Exception) {
-                            // 기타 예외 처리
                             Log.e("NetworkError", "Unknown error: ${e.message}")
                         }
                     }
@@ -231,8 +195,6 @@ fun MessageCard(msg: Message) {
         }
     }
 }
-
-
 
 @Composable
 fun ImageGrid(columns: Int = 2, onImageSelected: (Int) -> Unit) {
@@ -265,9 +227,8 @@ fun PreviewConversation() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            SampleData.conversationSample,
-            onNextButtonClicked = {},
-
+            messages = SampleData.conversationSample,
+            onNextButtonClicked = {}
         )
     }
 }
