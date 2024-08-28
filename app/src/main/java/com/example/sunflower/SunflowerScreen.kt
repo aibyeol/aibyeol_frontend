@@ -72,12 +72,6 @@ fun SunflowerApp(
     //recordingViewModel: RecordingViewModel
 ) {
     Scaffold(
-        topBar = {
-            SunflowerAppBar(
-                canNavigateBack = false,
-                navigateUp = { /* TODO: implement back navigation */ }
-            )
-        }
     ) {
             innerPadding ->
         /**

@@ -433,7 +433,7 @@ fun SurveyTopBar(
                 Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
             }
         },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color.Transparent)
+        colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color(0xFFFB8500))
     )
 }
 @Preview

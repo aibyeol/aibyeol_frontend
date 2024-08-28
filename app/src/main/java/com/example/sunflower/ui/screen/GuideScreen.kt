@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -63,7 +64,6 @@ fun GuideScreen() {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // AppBar와 유사한 상단 UI (스텝바)
             GuideTopBar()
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -80,9 +80,15 @@ fun GuideScreen() {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.star_icon),
-                        contentDescription = "Star Icon",
-                        modifier = Modifier.size(40.dp)
+                        painter = painterResource(R.drawable.star),
+                        contentDescription = "Contact profile picture",
+                        modifier = Modifier
+                            // Set image size to 40 dp
+                            .size(40.dp)
+                            //clip image to be shaped as a circle
+                            .clip(CircleShape)
+                            //set image border
+                            .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -107,9 +113,15 @@ fun GuideScreen() {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.star_icon), // 다른 아이콘을 사용해도 됩니다
-                        contentDescription = "Star Icon",
-                        modifier = Modifier.size(40.dp)
+                        painter = painterResource(R.drawable.star),
+                        contentDescription = "Contact profile picture",
+                        modifier = Modifier
+                            // Set image size to 40 dp
+                            .size(40.dp)
+                            //clip image to be shaped as a circle
+                            .clip(CircleShape)
+                            //set image border
+                            .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -134,9 +146,15 @@ fun GuideScreen() {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.star_icon), // 다른 아이콘을 사용해도 됩니다
-                        contentDescription = "Star Icon",
-                        modifier = Modifier.size(40.dp)
+                        painter = painterResource(R.drawable.star),
+                        contentDescription = "Contact profile picture",
+                        modifier = Modifier
+                            // Set image size to 40 dp
+                            .size(40.dp)
+                            //clip image to be shaped as a circle
+                            .clip(CircleShape)
+                            //set image border
+                            .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -152,9 +170,29 @@ fun GuideScreen() {
                             .padding(12.dp)
                     )
                 }
-            }
+                Spacer(modifier = Modifier.height(48.dp))
 
-            Spacer(modifier = Modifier.height(48.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                        },
+                        //버튼 색깔
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFB8500),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("next")
+                    }
+                }
+            }
         }
     }
 }

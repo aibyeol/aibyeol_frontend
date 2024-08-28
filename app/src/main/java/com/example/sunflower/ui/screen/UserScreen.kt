@@ -33,11 +33,6 @@ fun PreviewButton() {
     SunflowerTheme {
         val navController = rememberNavController()
         Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("아이별_demo") }
-                )
-            }
         ) { innerPadding ->
             NavHost(
                 navController = navController,
