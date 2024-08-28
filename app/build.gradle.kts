@@ -74,9 +74,6 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.coil)
-<<<<<<< HEAD
-
-=======
     implementation("androidx.compose.material:material-icons-extended:1.0.1")
->>>>>>> 3d2b7b0 (Feat : 피그마 기준 처음 세 페이지 구현 res/drawable에 잡다한 거 다 넣음)
+
 }
