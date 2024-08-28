@@ -46,6 +46,10 @@ object SampleData {
             MessageType.IMAGE_GRID
         ),
         Message(
+            "아이별",
+            MessageType.IMAGE
+        ),
+        Message(
             "User",
             MessageType.TEXT,
             "나는 뽀로로를 좋아해."
