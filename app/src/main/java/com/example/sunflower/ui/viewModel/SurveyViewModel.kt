@@ -10,17 +10,24 @@ class SurveyViewModel : ViewModel() {
     private val _isButtonEnabled = MutableLiveData(false)
     val isButtonEnabled: LiveData<Boolean> = _isButtonEnabled
 
-    private val _imageUrl = MutableLiveData<String?>(null)
-    val imageUrl: LiveData<String?> = _imageUrl
+    private val _imageUrls = MutableLiveData<List<String>>()
+    val imageUrls: LiveData<List<String>> = _imageUrls
 
+    private val _scenarioUrls = MutableLiveData<List<String>>()
+    val scenarioUrls: LiveData<List<String>> = _scenarioUrls
     // Function to update button enabled state
     fun setButtonEnabled(isEnabled: Boolean) {
         Log.d("SurveyViewModel", "setButtonEnabled called with: $isEnabled")
         _isButtonEnabled.value = isEnabled
     }
 
-    fun setImageUrl(url: String?) {
-        Log.d("SurveyViewModel", "setImageUrl called with: $url")
-        _imageUrl.value = url
+    fun setImageUrls(urls: List<String>) {
+        Log.d("SurveyViewModel", "setImageUrl called with: $urls")
+        _imageUrls.value = urls
+    }
+
+    fun setScenarioUrls(urls: List<String>) {
+        Log.d("SurveyViewModel", "setScenarioUrl called with: $urls")
+        _scenarioUrls.value = urls
     }
 }

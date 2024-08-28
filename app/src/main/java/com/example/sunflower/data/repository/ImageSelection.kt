@@ -18,6 +18,10 @@ data class IdentitySelectionResponse(
     val identityUrl: String
 )
 
+data class ScenariosResponse(
+    val scenarioUrl: String
+)
+
 data class UploadAudioRequest(
     @Part("audio")
     val audioFile: MultipartBody.Part

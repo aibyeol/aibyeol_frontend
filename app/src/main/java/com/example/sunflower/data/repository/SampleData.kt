@@ -43,12 +43,7 @@ object SampleData {
         ),
         Message(
             "아이별",
-            MessageType.IMAGE
-        ),
-        Message(
-            "Lexi",
-            MessageType.IMAGE_GRID,
-            imageIds = imageList
+            MessageType.IMAGE_GRID
         ),
         Message(
             "User",

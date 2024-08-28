@@ -198,13 +198,20 @@ fun MessageCard(
                 when (msg.messageType) {
                     MessageType.IMAGE_GRID -> {
                         onImageGridDisplayed(true)
-                        ImageGrid (
-                            images = msg.imageIds?: emptyList(),
-                            onImageSelected = { index ->
-                                selectedImageIndex.value = index
-                                onImageGridDisplayed(true)
-                            }
-                        )
+                        val imageUrls by viewModel.imageUrls.observeAsState(emptyList())
+                        Log.d("Image", "Trying to get imageUrl: $imageUrls")
+
+                        if (imageUrls.isNotEmpty()) {
+                            ImageGrid(
+                                images = imageUrls,
+                                onImageSelected = { index ->
+                                    selectedImageIndex.value = index
+                                    onImageGridDisplayed(true)
+                                }
+                            )
+                        } else {
+                            Text("No image available")
+                        }
                     }
                     MessageType.TEXT_GRID -> {
                         onImageGridDisplayed(false)
@@ -223,12 +230,12 @@ fun MessageCard(
                     }
                     MessageType.IMAGE -> {
                         onImageGridDisplayed(false)
-                        val imageUrl by viewModel.imageUrl.observeAsState()
+                        val imageUrl by viewModel.imageUrls.observeAsState()
 
                         Log.d("Image", "Trying to get imageUrl: $imageUrl")
                         if (imageUrl != null) {
                             Image(
-                                painter = rememberAsyncImagePainter("https://i.ibb.co/QMVCQg7/2.png"),
+                                painter = rememberAsyncImagePainter(imageUrl),
                                 contentDescription = "Message Image",
                                 modifier = Modifier
                                     .padding(bottom = 4.dp)
@@ -283,18 +290,14 @@ fun MessageCard(
                 //Identity 선택 처리하는 함수
                 LaunchedEffect(selectedIdentityIndex.value) {
                     if(selectedIdentityIndex.value != -1) {
-                        //val identityName = identityList[selectedIdentityIndex.value]
                         try {
                             Log.d("Network", "Sending request")
                             val response = identityService.sendIdentitySelection()
                             if (response.isNotEmpty()) {
-                                val identityResponse = response[selectedIdentityIndex.value]
-                                Log.d("ExampleFunction", "Received: ${identityResponse.id}")
-                                Log.d("ExampleFunction", "Received: ${identityResponse.identity}")
-                                Log.d("ExampleFunction", "Received: ${identityResponse.identityUrl}")
-                                Toast.makeText(context, "Identity Download Successful: ${identityResponse.identity}", Toast.LENGTH_SHORT).show()
-
-                                viewModel.setImageUrl(identityResponse.identityUrl)
+                                val identityResponse = response.map { it.identityUrl }
+                                viewModel.setImageUrls(identityResponse)
+                                Log.d("ExampleFunction", "Received: ${identityResponse[0]}")
+                                Toast.makeText(context, "Identity Download Successful", Toast.LENGTH_SHORT).show()
                             } else {
                                 Log.e("ExampleFunction", "Response list is empty")
                             }
@@ -307,6 +310,21 @@ fun MessageCard(
                             Log.e("NetworkError", "Unknown error: ${e.message}")
                             onResponseReceived(false)
                         }
+                        try{
+                            val response = identityService.sendScenarios()
+                            if (response.isNotEmpty()) {
+                                val scenariosResponse = response.map { it.scenarioUrl }
+                                viewModel.setScenarioUrls(scenariosResponse)
+                            } else {
+                                Log.e("ScenarioFunction", "Response list is empty")
+                            }
+                        } catch (e: IOException) {
+                            Log.e("NetworkError2", "Unknown error: ${e.message}")
+                            onResponseReceived(false)
+                        } catch (e: Exception) {
+                            Log.e("NetworkError2", "Unknown error: ${e.message}")
+                            onResponseReceived(false)
+                        }
                     }
                 }
             }
@@ -315,17 +333,14 @@ fun MessageCard(
 }
 
 @Composable
-fun ImageGrid(columns: Int = 2, onImageSelected: (Int) -> Unit, images: List<Int>) {
+fun ImageGrid(columns: Int = 2, onImageSelected: (Int) -> Unit, images: List<String>) {
     Row {
         repeat(columns) { column ->
             Column(Modifier.weight(1f)) {
-                images.chunked(columns)[column].forEachIndexed { index, imageResId ->
+                images.chunked(columns)[column].forEachIndexed { index, imageUrl ->
                     val painter = rememberAsyncImagePainter(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(imageResId)
-                            .apply {
-                                scale(Scale.FILL)
-                            }
+                            .data(imageUrl)
                             .build()
                     )
                     Image(
