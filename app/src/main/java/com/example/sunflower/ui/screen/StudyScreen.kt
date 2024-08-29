@@ -16,6 +16,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -186,5 +187,25 @@ fun StudyScreen(
                 }
             }
         }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Button(
+                onClick = {
+                    onNextButtonClicked()
+                },
+                //enabled = isButtonEnabled
+            ) {
+                Text("결과 보기!")
+            }
+        }
     }
+}
+
+@Preview
+@Composable
+fun StudyPreview() {
+    StudyScreen()
 }
