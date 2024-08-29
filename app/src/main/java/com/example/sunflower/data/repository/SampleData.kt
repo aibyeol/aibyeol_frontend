@@ -4,29 +4,29 @@
 package com.example.sunflower.data.repository
 
 import com.example.sunflower.R
-import com.example.sunflower.ui.screen.Message
-import com.example.sunflower.ui.screen.MessageType
 
-val imageList = listOf(
-    R.drawable.character01,
-    R.drawable.character02,
-    R.drawable.character03,
-    R.drawable.character04
+val identityMap = mapOf(
+    "Bread" to "빵",
+    "Princess" to "공주",
+    "Cat" to "고양이",
+    "Dino" to "공룡"
 )
 
-val identityList = listOf(
-    "빵",
-    "뽀로로",
-    "꿀벌",
-    "하츄핑"
+data class Message(
+    val author: String,
+    val messageType: MessageType,
+    val text: String? = null,
+    val imageId: Int? = null,
+    val scenario: Int? = null,
+    val imageIds: List<Int>? = null,
+    val textIds: Map<String, String>? = null
 )
-
-val imageNames = listOf(
-    "heartsping_default",
-    "pinkpong_default",
-    "poly_default",
-    "pororo_default"
-)
+enum class MessageType {
+    TEXT,
+    IMAGE,
+    IMAGE_GRID,
+    TEXT_GRID
+}
 
 object SampleData {
     // Sample conversation data
@@ -39,7 +39,7 @@ object SampleData {
         Message(
             "아이별",
             MessageType.TEXT_GRID,
-            textIds = identityList
+            textIds = identityMap
         ),
         Message(
             "아이별",

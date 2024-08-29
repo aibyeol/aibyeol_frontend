@@ -5,11 +5,12 @@ import com.example.sunflower.data.repository.ScenariosResponse
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface IdentityService {
-    @GET("aibyeol/identity/cat")
-    suspend fun sendIdentitySelection(): List<IdentitySelectionResponse>
+    @GET("aibyeol/identity/{character}")
+    suspend fun sendIdentitySelection(@Path("character") character: String): List<IdentitySelectionResponse>
 
-    @GET("aibyeol/scenario/16")
-    suspend fun sendScenarios(): List<ScenariosResponse>
+    @GET("aibyeol/scenario/{charId}")
+    suspend fun sendCharacterSelection(@Path("charId") charId: Int): List<ScenariosResponse>
 }

@@ -48,7 +48,9 @@ fun RewardPreview(){
 }
 
 @Composable
-fun RewardScreen(){
+fun RewardScreen(
+    onNextButtonClicked : () -> Unit = {}
+){
     Box(
         modifier = Modifier
             .fillMaxSize(), // or any other modifier you need
@@ -84,7 +86,7 @@ fun RewardScreen(){
 //        contentAlignment = Alignment.BottomCenter // Centers the child composable
     ) {
         Button(
-            onClick = {/*네비게이터? 들어가야됨*/},
+            onClick = { onNextButtonClicked() },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFFDF0D5),
                 contentColor = Color(0xFF023047)

@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sunflower.data.repository.SampleData
 import com.example.sunflower.ui.screen.InitScreen
 import com.example.sunflower.ui.screen.RewardScreen
+import com.example.sunflower.ui.screen.StarScreen
 import com.example.sunflower.ui.screen.StudyScreen
 import com.example.sunflower.ui.viewModel.StudyViewModel
 import com.example.sunflower.ui.screen.SurveyScreen
@@ -42,7 +43,8 @@ enum class SunflowerScreen() {
     User,
     Survey,
     Study,
-    Reward
+    Reward,
+    Star
 }
 
 /**
@@ -170,7 +172,15 @@ fun SunflowerApp(
             }
 
             composable(route = SunflowerScreen.Reward.name) {
-                RewardScreen()
+                RewardScreen(
+                    onNextButtonClicked = {
+                        navController.navigate(SunflowerScreen.Star.name)
+                    }
+                )
+            }
+
+            composable(route = SunflowerScreen.Star.name) {
+                StarScreen()
             }
         }
     }

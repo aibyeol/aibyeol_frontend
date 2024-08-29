@@ -61,10 +61,12 @@ import com.example.sunflower.data.repository.ImageSelectionData
 import com.example.sunflower.R
 import com.example.sunflower.data.api.ApiServiceSingleton
 import com.example.sunflower.data.api.IdentityServiceSingleton
+import com.example.sunflower.data.repository.Message
+import com.example.sunflower.data.repository.MessageType
 import com.example.sunflower.data.repository.SampleData
-import com.example.sunflower.data.repository.identityList
-import com.example.sunflower.data.repository.imageList
-import com.example.sunflower.data.repository.imageNames
+//import com.example.sunflower.data.repository.identityList
+import com.example.sunflower.data.repository.identityMap
+//import com.example.sunflower.data.repository.imageNames
 import com.example.sunflower.ui.theme.SunflowerTheme
 import com.example.sunflower.ui.viewModel.RecordingViewModel
 import com.example.sunflower.ui.viewModel.SurveyViewModel
@@ -78,22 +80,6 @@ import java.util.concurrent.TimeUnit
 /**
  * SampleData.kt의 conversationsample list 안에 들어있는 데이터입니다.
  **/
-data class Message(
-    val author: String,
-    val messageType: MessageType,
-    val text: String? = null,
-    val imageId: Int? = null,
-    val scenario: Int? = null,
-    val imageIds: List<Int>? = null,
-    val textIds: List<String>? = null
-)
-enum class MessageType {
-    TEXT,
-    IMAGE,
-    IMAGE_GRID,
-    TEXT_GRID
-}
-
 @Composable
 fun SurveyScreen(
     modifier: Modifier = Modifier,
@@ -275,15 +261,19 @@ fun MessageCard(
                     }
                 }
 
-                val apiService by lazy { ApiServiceSingleton.apiService }
+                //val apiService by lazy { ApiServiceSingleton.apiService }
                 val identityService by lazy { IdentityServiceSingleton.identityService }
                 LaunchedEffect(selectedImageIndex.value) {
                     if (selectedImageIndex.value != -1) {
                         //val imageId = imageList[selectedImageIndex.value]
-                        val imageName = imageNames[selectedImageIndex.value]
-                        Log.d("Network", "selectedImageIndex: $selectedImageIndex, imageName: $imageName")
+                        //val imageName = imageNames[selectedImageIndex.value]
+                        Log.d("Network", "selectedImageIndex: $selectedImageIndex")
+                        onResponseReceived(true)
+
+                        /*
                         try {
                             Log.d("Network", "Sending request")
+
                             val response = apiService.sendImageSelection(
                                 ImageSelectionData(imageName)
                             )
@@ -312,35 +302,51 @@ fun MessageCard(
                             Log.e("NetworkError", "Unknown error: ${e.message}")
                             onResponseReceived(false)
                         }
+                         */
                     }
                     selectedImageIndex.value = -1
                 }
 
 
+
                 //Identity 선택 처리하는 함수
                 LaunchedEffect(selectedIdentityIndex.value) {
                     if(selectedIdentityIndex.value != -1) {
-                        try {
-                            Log.d("Network", "Sending request")
-                            val response = identityService.sendIdentitySelection()
-                            if (response.isNotEmpty()) {
-                                val identityResponse = response.map { it.identityUrl }
-                                viewModel.setImageUrls(identityResponse)
-                                Log.d("ExampleFunction", "Received: ${identityResponse[0]}")
-                                Toast.makeText(context, "Identity Download Successful", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Log.e("ExampleFunction", "Response list is empty")
+                        val identityKeys = identityMap.keys.toList()
+                        if (selectedIdentityIndex.value in identityKeys.indices) {
+                            val selectedKey = identityKeys[selectedIdentityIndex.value]
+
+                            try {
+                                Log.d("Network", "Sending request for key :$selectedKey")
+                                val response = identityService.sendIdentitySelection(selectedKey)
+
+                                if (response.isNotEmpty()) {
+                                    val identityResponse = response.map { it.identityUrl }
+                                    viewModel.setImageUrls(identityResponse)
+                                    Log.d("ExampleFunction", "Received: ${identityResponse[0]}")
+                                    Toast.makeText(
+                                        context,
+                                        "Identity Download Successful",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Log.e("ExampleFunction", "Response list is empty")
+                                }
+                            } catch (e: IOException) {
+                                // 네트워크 오류 처리
+                                Log.e("NetworkError", "IOException: ${e.message}")
+                                onResponseReceived(false)
+                            } catch (e: Exception) {
+                                // 기타 예외 처리
+                                Log.e("NetworkError", "Unknown error: ${e.message}")
+                                onResponseReceived(false)
                             }
-                        } catch (e: IOException) {
-                            // 네트워크 오류 처리
-                            Log.e("NetworkError", "IOException: ${e.message}")
-                            onResponseReceived(false)
-                        } catch (e: Exception) {
-                            // 기타 예외 처리
-                            Log.e("NetworkError", "Unknown error: ${e.message}")
-                            onResponseReceived(false)
+                        } else {
+                            Log.e("ExampleFunction", "Invalid index: ${selectedIdentityIndex.value}")
                         }
-                        try{
+                        selectedIdentityIndex.value = -1
+                        /*
+                        try {
                             val response = identityService.sendScenarios()
                             if (response.isNotEmpty()) {
                                 val scenariosResponse = response.map { it.scenario }
@@ -355,9 +361,8 @@ fun MessageCard(
                         } catch (e: Exception) {
                             Log.e("NetworkError2", "Unknown error: ${e.message}")
                             onResponseReceived(false)
-                        }
+                        }*/
                     }
-                    selectedIdentityIndex.value = -1
                 }
             }
         }
@@ -394,10 +399,11 @@ fun ImageGrid(columns: Int = 2, onImageSelected: (Int) -> Unit, images: List<Str
 
 @Composable
 fun TextGrid(columns: Int = 2, onTextSelected: (Int) -> Unit) {
+    val identityValues=  identityMap.values.toList()
     Row {
         repeat(columns) { column ->
             Column(Modifier.weight(1f)) {
-                identityList.chunked(columns)[column].forEachIndexed { index, textId ->
+                identityValues.chunked(columns)[column].forEachIndexed { index, textId ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
