@@ -32,9 +32,9 @@ object SampleData {
     // Sample conversation data
     val conversationSample = listOf(
         Message(
-            "Lexi",
+            "아이별",
             MessageType.TEXT,
-            "Hello AIByeol"
+            "안녕하세요, 아이별입니다!"
         ),
         Message(
             "아이별",

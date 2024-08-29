@@ -92,7 +92,7 @@ fun StudyTopBar(
                 Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
             }
         },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color(0xFFFB8500))
     )
 }
 

@@ -23,10 +23,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +45,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -104,10 +114,19 @@ fun SurveyScreen(
             viewModel.setButtonEnabled(false)
         }
     }
-
+    //배경이미지 삽입
+    Image(
+        painter = painterResource(id = R.drawable.chat_image), // 배경 이미지
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(), // 화면 전체 크기로 설정
+        contentScale = ContentScale.Crop  // 이미지 크롭으로 맞추기
+    )
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.SpaceBetween
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start
     ) {
         MessageCard(
             msg = messages[currentIndex],
@@ -117,6 +136,7 @@ fun SurveyScreen(
                 viewModel.setButtonEnabled(isSuccessful)
             }
         )
+        Spacer(modifier = Modifier.weight(1f))  // Pushes buttons to the bottom
 
         Row(
             modifier = Modifier
@@ -134,7 +154,12 @@ fun SurveyScreen(
                         onNextButtonClicked()
                     }
                 },
-                enabled = isButtonEnabled
+                enabled = isButtonEnabled,
+                //버튼 색깔
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFFB8500),
+                    contentColor = Color.White
+                )
             ) {
                 Text("Next")
             }
@@ -161,7 +186,7 @@ fun MessageCard(
         horizontalArrangement = if (msg.author == "User") Arrangement.End else Arrangement.Start) {
         if (msg.author != "User") {
             Image(
-                painter = painterResource(R.drawable.profile_picture),
+                painter = painterResource(R.drawable.star),
                 contentDescription = "Contact profile picture",
                 modifier = Modifier
                     // Set image size to 40 dp
@@ -388,4 +413,27 @@ fun TextGrid(columns: Int = 2, onTextSelected: (Int) -> Unit) {
             }
         }
     }
+}
+
+//상단바 추가
+@Composable
+fun SurveyTopBar(
+    title: String = "",
+    onMenuClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
+) {
+    TopAppBar(
+        title = { Text(text = title) },
+        navigationIcon = {
+            IconButton(onClick = onMenuClick) {
+                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
+            }
+        },
+        actions = {
+            IconButton(onClick = onSettingsClick) {
+                Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
+            }
+        },
+        colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color(0xFFFB8500))
+    )
 }

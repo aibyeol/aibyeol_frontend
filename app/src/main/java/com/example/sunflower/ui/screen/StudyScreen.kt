@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -38,6 +39,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -56,6 +58,7 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.sunflower.R
+import com.example.sunflower.StudyTopBar
 import com.example.sunflower.ui.theme.SunflowerTheme
 import com.example.sunflower.ui.viewModel.RecordingViewModel
 import com.example.sunflower.ui.viewModel.SurveyViewModel
@@ -123,8 +126,9 @@ fun StudyScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "hello study",
-                style = MaterialTheme.typography.headlineSmall
+                text = "시나리오가 끝났습니다." +
+                        "상황에 맞는 알맞은 답변을 해주세요!",
+                style = MaterialTheme.typography.bodyLarge
             )
             Spacer(modifier = Modifier.height(8.dp))
             /**
@@ -171,7 +175,13 @@ fun StudyScreen(
                 Button(onClick = {
                     recordingViewModel.startRecording(context)
                     surveyViewModel.setButtonEnabled(true) // Enable stop button after start
-                }) {
+                },
+
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFB8500),
+                        contentColor = Color.White
+                    )
+                ) {
                     Text(text = "누르고 이야기하기!")
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -181,7 +191,11 @@ fun StudyScreen(
                         recordingViewModel.sendRecordingToServer()
                         surveyViewModel.setButtonEnabled(false) // Disable stop button after stop
                     },
-                    enabled = isButtonEnabled
+                    enabled = isButtonEnabled,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFFB8500),
+                        contentColor = Color.White
+                    )
                 ) {
                     Text(text = "이야기 끝!")
                 }
@@ -196,6 +210,10 @@ fun StudyScreen(
                 onClick = {
                     onNextButtonClicked()
                 },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFFB8500),
+                    contentColor = Color.White
+                )
                 //enabled = isButtonEnabled
             ) {
                 Text("결과 보기!")
