@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <domain-override host="3.35.89.10" includeSubdomains="true">
+            <domain-config cleartextTrafficPermitted="true" />
+        </domain-override>
+    </base-config>
+</network-security-config>
